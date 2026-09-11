@@ -1,0 +1,28 @@
+package require tcltest
+package require calculator 1.0
+
+namespace import ::tcltest::*
+
+set testDirectory [file dirname [info script]]
+set srcDirectory [file normalize [file join $testDirectory .. src]]
+
+lappend auto_path $srcDirectory
+
+set testDirectory [file dirname [info script]]
+
+set tests {
+    {addition {Calculator::addition 2 3} 5}
+    {subtraction {Calculator::subtraction 5 2} 3}
+    {multiplication {Calculator::multiplication 3 4} 12}
+    {division {Calculator::division 10 3} 3}
+    {modulus {Calculator::modulus 10 3} 1}
+}
+
+foreach test $tests {
+    lassign $test operation command expected
+    test calculator-$operation-1 "calculator $operation" -body $command -result $expected
+}
+
+testConstraint hasTcltest [expr {[package provide tcltest] ne ""}]
+
+cleanupTests
