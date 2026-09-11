@@ -1,0 +1,22 @@
+package require tcltest
+package require numbers 1.0
+
+namespace import ::tcltest::*
+
+test numbers-iterative-sum-1 "sum_of_first_n_ite" -body {Numbers::sum_of_first_n_ite 0} -result 0
+test numbers-iterative-sum-2 "sum_of_first_n_ite" -body {Numbers::sum_of_first_n_ite 3} -result 6
+
+test numbers-iterative-factorial-1 "factorial_ite" -body {Numbers::factorial_ite 0} -result 1
+test numbers-iterative-factorial-2 "factorial_ite" -body {Numbers::factorial_ite 4} -result 24
+
+test numbers-iterative-fibonacci-1 "fibonacci_ite" -body {Numbers::fibonacci_ite 0} -result 0
+test numbers-iterative-fibonacci-2 "fibonacci_ite" -body {Numbers::fibonacci_ite 1} -result 1
+test numbers-iterative-fibonacci-3 "fibonacci_ite" -body {Numbers::fibonacci_ite 6} -result 8
+
+test numbers-iterative-gcd-1 "greatest_common_divisor_ite" -body {Numbers::greatest_common_divisor_ite 12 8} -result 4
+test numbers-iterative-gcd-2 "greatest_common_divisor_ite" -body {Numbers::greatest_common_divisor_ite 7 5} -result 1
+
+test numbers-iterative-lcm-1 "least_common_multiple_ite" -body {Numbers::least_common_multiple_ite 4 6} -result 12
+test numbers-iterative-lcm-2 "least_common_multiple_ite" -body {Numbers::least_common_multiple_ite 6 8} -result 24
+
+cleanupTests

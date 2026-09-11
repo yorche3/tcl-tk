@@ -1,0 +1,22 @@
+package require tcltest
+package require numbers 1.0
+
+namespace import ::tcltest::*
+
+test numbers-recursive-sum-1 "sum_of_first_n_rec" -body {Numbers::sum_of_first_n_rec 0} -result 0
+test numbers-recursive-sum-2 "sum_of_first_n_rec" -body {Numbers::sum_of_first_n_rec 3} -result 6
+
+test numbers-recursive-factorial-1 "factorial_rec" -body {Numbers::factorial_rec 0} -result 1
+test numbers-recursive-factorial-2 "factorial_rec" -body {Numbers::factorial_rec 4} -result 24
+
+test numbers-recursive-fibonacci-1 "fibonacci_rec" -body {Numbers::fibonacci_rec 0} -result 0
+test numbers-recursive-fibonacci-2 "fibonacci_rec" -body {Numbers::fibonacci_rec 1} -result 1
+test numbers-recursive-fibonacci-3 "fibonacci_rec" -body {Numbers::fibonacci_rec 6} -result 8
+
+test numbers-recursive-gcd-1 "greatest_common_divisor_rec" -body {Numbers::greatest_common_divisor_rec 12 8} -result 4
+test numbers-recursive-gcd-2 "greatest_common_divisor_rec" -body {Numbers::greatest_common_divisor_rec 7 5} -result 1
+
+test numbers-recursive-lcm-1 "least_common_multiple_rec" -body {Numbers::least_common_multiple_rec 4 6} -result 12
+test numbers-recursive-lcm-2 "least_common_multiple_rec" -body {Numbers::least_common_multiple_rec 6 8} -result 24
+
+cleanupTests
