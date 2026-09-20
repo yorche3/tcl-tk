@@ -9,6 +9,7 @@ Proyectos en **Tcl/Tk**, con scripts independientes ejecutados mediante `tclsh` 
 | Módulo | Descripción |
 | ------ | ----------- |
 | [`core/foundations/`](core/foundations/) | **Fase 0 — Fundamentos**: `helloworld`, `hellouser`, `unit_test/calculator`, `numbers` |
+| [`core/algorithms/`](core/algorithms/) | **Fase 1 — Algoritmos Puros**: `naive_sort` |
 
 ---
 
@@ -34,6 +35,10 @@ TCLLIBPATH="$(cd ../src && pwd)" tclsh9.0 calculator.test
 cd ../../numbers/test
 TCLLIBPATH="$(cd ../src && pwd)" tclsh9.0 recursive.test
 TCLLIBPATH="$(cd ../src && pwd)" tclsh9.0 iterative.test
+
+# Naive Sort tests
+cd ../../algorithms/naive_sort/test
+TCLLIBPATH="$(cd ../src && pwd)" tclsh9.0 naive_sort.test
 ```
 
 ---
