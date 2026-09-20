@@ -20,7 +20,68 @@
 namespace eval NaiveSort {
     namespace export selection_sort bubble_sort insertion_sort
 
+    proc selection_sort {array} {
+      set n [llength $array]
+      if {$n <= 1} {
+          return $array
+      }
+      set result $array
+      for {set i 0} {$i < $n - 1} {incr i} {
+          set minIndex $i
+          for {set j [expr {$i + 1}]} {$j < $n} {incr j} {
+              if {[lindex $result $j] < [lindex $result $minIndex]} {
+                  set minIndex $j
+              }
+          }
+          if {$minIndex != $i} {
+              set temp [lindex $result $i]
+              lset result $i [lindex $result $minIndex]
+              lset result $minIndex $temp
+          }
+      }
+      return $result
+    }
     
+    proc bubble_sort {array} {
+      set n [llength $array]
+      if {$n <= 1} {
+          return $array
+      }
+      set result $array
+      for {set i 0} {$i < $n - 1} {incr i} {
+          set swapped 0
+          for {set j 0} {$j < $n - 1 - $i} {incr j} {
+              if {[lindex $result $j] > [lindex $result [expr {$j + 1}]]} {
+                  set temp [lindex $result $j]
+                  lset result $j [lindex $result [expr {$j + 1}]]
+                  lset result [expr {$j + 1}] $temp
+                  set swapped 1
+              }
+          }
+          if {!$swapped} {
+              break
+          }
+      }
+      return $result
+    }
+
+    proc insertion_sort {array} {
+      set n [llength $array]
+      if {$n <= 1} {
+          return $array
+      }
+      set result $array
+      for {set i 1} {$i < $n} {incr i} {
+          set j $i
+          while {$j > 0 && [lindex $result $j] < [lindex $result [expr {$j - 1}]]} {
+              set temp [lindex $result $j]
+              lset result $j [lindex $result [expr {$j - 1}]]
+              lset result [expr {$j - 1}] $temp
+              incr j -1
+          }
+      }
+      return $result
+    }
 }
 
 package provide naive_sort 1.0
