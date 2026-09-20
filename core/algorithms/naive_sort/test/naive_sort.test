@@ -1,0 +1,64 @@
+# Casos de prueba de la especificación 05_Naive_Sort.md
+#
+# Caso nulo omitido: Tcl no tiene `null`/`nil`, y la lista vacía (`{}`) no se
+# distingue de una cadena vacía, así que una entrada nula no es representable y
+# no hay indicador de fallo que comprobar. Se conservan los 7 casos de la
+# especificación.
+#
+# Aislamiento: las listas de Tcl son valores, así que cada caso recibe su propia
+# copia y los fixtures compartidos no se modifican.
+
+package require tcltest
+package require naive_sort 1.0
+
+namespace import ::tcltest::*
+
+# Entradas de la especificación
+set standardInput {5 2 9 1 5 6}
+set standardOutput {1 2 5 5 6 9}
+
+set sortedInput {1 2 3 4 5}
+set sortedOutput {1 2 3 4 5}
+
+set reverseInput {5 4 3 2 1}
+set reverseOutput {1 2 3 4 5}
+
+set identicalInput {7 7 7 7}
+set identicalOutput {7 7 7 7}
+
+set negativeInput {3 -1 4 -5 0}
+set negativeOutput {-5 -1 0 3 4}
+
+set singleInput {42}
+set singleOutput {42}
+
+set emptyInput {}
+set emptyOutput {}
+
+# Tabla de casos: descripción, entrada y salida esperada.
+set cases [list \
+    [list "an unsorted array" $standardInput $standardOutput] \
+    [list "an already sorted array" $sortedInput $sortedOutput] \
+    [list "a reverse ordered array" $reverseInput $reverseOutput] \
+    [list "an array of identical elements" $identicalInput $identicalOutput] \
+    [list "an array with negative numbers" $negativeInput $negativeOutput] \
+    [list "a single element array" $singleInput $singleOutput] \
+    [list "an empty array" $emptyInput $emptyOutput]]
+
+# Helper compartido: recibe el nombre del algoritmo y la función a probar, y
+# ejecuta todos los casos con el mensaje descriptivo del contrato.
+proc assert_sorts_all_cases {algorithm function} {
+    foreach testCase $::cases {
+        lassign $testCase description input expected
+
+        test "$algorithm: $description" "$algorithm should sort $description" \
+            -body [list $function $input] \
+            -result $expected
+    }
+}
+
+assert_sorts_all_cases "selection_sort" NaiveSort::selection_sort
+assert_sorts_all_cases "bubble_sort" NaiveSort::bubble_sort
+assert_sorts_all_cases "insertion_sort" NaiveSort::insertion_sort
+
+cleanupTests
