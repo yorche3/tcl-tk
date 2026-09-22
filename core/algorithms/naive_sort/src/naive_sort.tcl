@@ -72,13 +72,13 @@ namespace eval NaiveSort {
       }
       set result $array
       for {set i 1} {$i < $n} {incr i} {
-          set j $i
-          while {$j > 0 && [lindex $result $j] < [lindex $result [expr {$j - 1}]]} {
-              set temp [lindex $result $j]
-              lset result $j [lindex $result [expr {$j - 1}]]
-              lset result [expr {$j - 1}] $temp
+          set key [lindex $result $i]
+          set j [expr {$i - 1}]
+          while {$j >= 0 && [lindex $result $j] > $key} {
+              lset result [expr {$j + 1}] [lindex $result $j]
               incr j -1
           }
+          lset result [expr {$j + 1}] $key
       }
       return $result
     }
