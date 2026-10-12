@@ -1,0 +1,244 @@
+# Test runner scaffold for data_structures_basics.
+# Test cases are added in the suite step (4c).
+
+package require tcltest
+package require data_structures_basics 1.0
+
+namespace import ::tcltest::*
+
+namespace eval DataStructuresBasicsTests {
+    variable nodeInitialValueInput 10
+    variable nodeInitialValueOutput 10
+    variable nodeInitialNextOutput {}
+    variable nodeLinkedValueInput 20
+    variable nodeLinkedValueOutput 20
+    variable nodeLinkedNextOutput {}
+
+    variable linkedListEmptyOutput 1
+    variable linkedListEmptySizeOutput 0
+    variable linkedListFailureOutput -1
+    variable linkedListFirstTailInput 10
+    variable linkedListSecondTailInput 20
+    variable linkedListHeadInput 5
+    variable linkedListDuplicateTailInput 10
+    variable linkedListPopulatedSizeOutput 4
+    variable linkedListHeadOutput 5
+    variable linkedListDeleteInput 10
+    variable linkedListDeleteOutput 1
+    variable linkedListDeletedSizeOutput 3
+    variable linkedListMissingInput 99
+    variable linkedListMissingDeleteOutput 0
+    variable linkedListFirstRemovalInput 5
+    variable linkedListSecondRemovalInput 20
+    variable linkedListThirdRemovalInput 10
+
+    variable stackEmptyOutput 1
+    variable stackEmptySizeOutput 0
+    variable stackFailureOutput -1
+    variable stackFirstPushInput 10
+    variable stackSecondPushInput 20
+    variable stackThirdPushInput 30
+    variable stackPeekOutput 30
+    variable stackPopOutput 30
+    variable stackReusePushInput 40
+    variable stackReusePopOutput 40
+    variable stackSecondPopOutput 20
+    variable stackThirdPopOutput 10
+
+    variable queueEmptyOutput 1
+    variable queueEmptySizeOutput 0
+    variable queueFailureOutput -1
+    variable queueFirstEnqueueInput 10
+    variable queueSecondEnqueueInput 20
+    variable queueThirdEnqueueInput 30
+    variable queuePeekOutput 10
+    variable queueFirstDequeueOutput 10
+    variable queueReuseEnqueueInput 40
+    variable queueSecondDequeueOutput 20
+    variable queueThirdDequeueOutput 30
+    variable queueReuseDequeueOutput 40
+
+    proc assert_equal {caseName subject actual expected} {
+        if {$actual ne $expected} {
+            error "$caseName: $subject should equal $expected, got $actual"
+        }
+    }
+
+    proc run_node_cases {} {
+        variable nodeInitialValueInput
+        variable nodeInitialValueOutput
+        variable nodeInitialNextOutput
+        variable nodeLinkedValueInput
+        variable nodeLinkedValueOutput
+        variable nodeLinkedNextOutput
+
+        set a [DataStructuresBasics::Node new $nodeInitialValueInput]
+        assert_equal node-initialize-value "Node get_value" [$a get_value] $nodeInitialValueOutput
+        assert_equal node-initialize-link "Node get_next" [$a get_next] $nodeInitialNextOutput
+
+        set b [DataStructuresBasics::Node new $nodeLinkedValueInput]
+        $a set_next $b
+        set next [$a get_next]
+        assert_equal node-link-traverse "Node get_value through get_next" [$next get_value] $nodeLinkedValueOutput
+        assert_equal node-link-absence "Node get_next" [$b get_next] $nodeLinkedNextOutput
+
+        $a destroy
+        $b destroy
+    }
+
+    proc run_linked_list_cases {} {
+        variable linkedListEmptyOutput
+        variable linkedListEmptySizeOutput
+        variable linkedListFailureOutput
+        variable linkedListFirstTailInput
+        variable linkedListSecondTailInput
+        variable linkedListHeadInput
+        variable linkedListDuplicateTailInput
+        variable linkedListPopulatedSizeOutput
+        variable linkedListHeadOutput
+        variable linkedListDeleteInput
+        variable linkedListDeleteOutput
+        variable linkedListDeletedSizeOutput
+        variable linkedListMissingInput
+        variable linkedListMissingDeleteOutput
+        variable linkedListFirstRemovalInput
+        variable linkedListSecondRemovalInput
+        variable linkedListThirdRemovalInput
+
+        set list [DataStructuresBasics::LinkedList new]
+        assert_equal linked-list-empty-state "LinkedList is_empty" [$list is_empty] $linkedListEmptyOutput
+        assert_equal linked-list-empty-state "LinkedList size" [$list size] $linkedListEmptySizeOutput
+        assert_equal linked-list-empty-state "LinkedList get_head" [$list get_head] $linkedListFailureOutput
+
+        $list insert_tail $linkedListFirstTailInput
+        $list insert_tail $linkedListSecondTailInput
+        $list insert_head $linkedListHeadInput
+        $list insert_tail $linkedListDuplicateTailInput
+        assert_equal linked-list-insert-both-ends "LinkedList size" [$list size] $linkedListPopulatedSizeOutput
+        assert_equal linked-list-insert-both-ends "LinkedList get_head" [$list get_head] $linkedListHeadOutput
+
+        assert_equal linked-list-delete-first-occurrence "LinkedList delete" [$list delete $linkedListDeleteInput] $linkedListDeleteOutput
+        assert_equal linked-list-delete-first-occurrence "LinkedList size" [$list size] $linkedListDeletedSizeOutput
+        assert_equal linked-list-delete-first-occurrence "LinkedList get_head" [$list get_head] $linkedListHeadOutput
+
+        assert_equal linked-list-absent-value "LinkedList delete" [$list delete $linkedListMissingInput] $linkedListMissingDeleteOutput
+        assert_equal linked-list-absent-value "LinkedList size" [$list size] $linkedListDeletedSizeOutput
+        assert_equal linked-list-absent-value "LinkedList get_head" [$list get_head] $linkedListHeadOutput
+
+        assert_equal linked-list-empty "LinkedList delete first value" [$list delete $linkedListFirstRemovalInput] $linkedListDeleteOutput
+        assert_equal linked-list-empty "LinkedList get_head after first removal" [$list get_head] $linkedListSecondTailInput
+        assert_equal linked-list-empty "LinkedList delete second value" [$list delete $linkedListSecondRemovalInput] $linkedListDeleteOutput
+        assert_equal linked-list-empty "LinkedList get_head after second removal" [$list get_head] $linkedListDuplicateTailInput
+        assert_equal linked-list-empty "LinkedList delete third value" [$list delete $linkedListThirdRemovalInput] $linkedListDeleteOutput
+        assert_equal linked-list-empty "LinkedList is_empty" [$list is_empty] $linkedListEmptyOutput
+        assert_equal linked-list-empty "LinkedList size" [$list size] $linkedListEmptySizeOutput
+        assert_equal linked-list-empty "LinkedList get_head" [$list get_head] $linkedListFailureOutput
+
+        $list destroy
+    }
+
+    proc run_stack_cases {} {
+        variable stackEmptyOutput
+        variable stackEmptySizeOutput
+        variable stackFailureOutput
+        variable stackFirstPushInput
+        variable stackSecondPushInput
+        variable stackThirdPushInput
+        variable stackPeekOutput
+        variable stackPopOutput
+        variable stackReusePushInput
+        variable stackReusePopOutput
+        variable stackSecondPopOutput
+        variable stackThirdPopOutput
+
+        set stack [DataStructuresBasics::Stack new]
+        assert_equal stack-empty-state "Stack is_empty" [$stack is_empty] $stackEmptyOutput
+        assert_equal stack-empty-state "Stack size" [$stack size] $stackEmptySizeOutput
+        assert_equal stack-empty-state "Stack peek" [$stack peek] $stackFailureOutput
+        assert_equal stack-empty-state "Stack pop" [$stack pop] $stackFailureOutput
+
+        $stack push $stackFirstPushInput
+        $stack push $stackSecondPushInput
+        $stack push $stackThirdPushInput
+        assert_equal stack-lifo-peek "Stack peek" [$stack peek] $stackPeekOutput
+        assert_equal stack-lifo-peek "Stack size" [$stack size] 3
+
+        assert_equal stack-removal-reuse "Stack pop" [$stack pop] $stackPopOutput
+        $stack push $stackReusePushInput
+        assert_equal stack-removal-reuse "Stack first reused pop" [$stack pop] $stackReusePopOutput
+        assert_equal stack-removal-reuse "Stack second pop" [$stack pop] $stackSecondPopOutput
+        assert_equal stack-removal-reuse "Stack third pop" [$stack pop] $stackThirdPopOutput
+        assert_equal stack-removal-reuse "Stack is_empty" [$stack is_empty] $stackEmptyOutput
+        assert_equal stack-removal-reuse "Stack size" [$stack size] $stackEmptySizeOutput
+
+        assert_equal stack-empty-after-removal "Stack pop" [$stack pop] $stackFailureOutput
+        assert_equal stack-empty-after-removal "Stack is_empty" [$stack is_empty] $stackEmptyOutput
+
+        $stack destroy
+    }
+
+    proc run_queue_cases {} {
+        variable queueEmptyOutput
+        variable queueEmptySizeOutput
+        variable queueFailureOutput
+        variable queueFirstEnqueueInput
+        variable queueSecondEnqueueInput
+        variable queueThirdEnqueueInput
+        variable queuePeekOutput
+        variable queueFirstDequeueOutput
+        variable queueReuseEnqueueInput
+        variable queueSecondDequeueOutput
+        variable queueThirdDequeueOutput
+        variable queueReuseDequeueOutput
+
+        set queue [DataStructuresBasics::Queue new]
+        assert_equal queue-empty-state "Queue is_empty" [$queue is_empty] $queueEmptyOutput
+        assert_equal queue-empty-state "Queue size" [$queue size] $queueEmptySizeOutput
+        assert_equal queue-empty-state "Queue peek" [$queue peek] $queueFailureOutput
+        assert_equal queue-empty-state "Queue dequeue" [$queue dequeue] $queueFailureOutput
+
+        $queue enqueue $queueFirstEnqueueInput
+        $queue enqueue $queueSecondEnqueueInput
+        $queue enqueue $queueThirdEnqueueInput
+        assert_equal queue-fifo-peek "Queue peek" [$queue peek] $queuePeekOutput
+        assert_equal queue-fifo-peek "Queue size" [$queue size] 3
+
+        assert_equal queue-removal-reuse "Queue dequeue" [$queue dequeue] $queueFirstDequeueOutput
+        $queue enqueue $queueReuseEnqueueInput
+        assert_equal queue-removal-reuse "Queue second dequeue" [$queue dequeue] $queueSecondDequeueOutput
+        assert_equal queue-removal-reuse "Queue third dequeue" [$queue dequeue] $queueThirdDequeueOutput
+        assert_equal queue-removal-reuse "Queue reused dequeue" [$queue dequeue] $queueReuseDequeueOutput
+        assert_equal queue-removal-reuse "Queue is_empty" [$queue is_empty] $queueEmptyOutput
+        assert_equal queue-removal-reuse "Queue size" [$queue size] $queueEmptySizeOutput
+
+        assert_equal queue-empty-after-removal "Queue dequeue" [$queue dequeue] $queueFailureOutput
+        assert_equal queue-empty-after-removal "Queue is_empty" [$queue is_empty] $queueEmptyOutput
+
+        $queue destroy
+    }
+}
+
+test data-structures-basics-node-get-value-1 "Node get_value" -body {DataStructuresBasicsTests::run_node_cases} -result {}
+test data-structures-basics-node-get-next-1 "Node get_next" -body {DataStructuresBasicsTests::run_node_cases} -result {}
+test data-structures-basics-node-set-next-1 "Node set_next" -body {DataStructuresBasicsTests::run_node_cases} -result {}
+
+test data-structures-basics-linked-list-get-head-1 "LinkedList get_head" -body {DataStructuresBasicsTests::run_linked_list_cases} -result {}
+test data-structures-basics-linked-list-insert-head-1 "LinkedList insert_head" -body {DataStructuresBasicsTests::run_linked_list_cases} -result {}
+test data-structures-basics-linked-list-insert-tail-1 "LinkedList insert_tail" -body {DataStructuresBasicsTests::run_linked_list_cases} -result {}
+test data-structures-basics-linked-list-delete-1 "LinkedList delete" -body {DataStructuresBasicsTests::run_linked_list_cases} -result {}
+test data-structures-basics-linked-list-is-empty-1 "LinkedList is_empty" -body {DataStructuresBasicsTests::run_linked_list_cases} -result {}
+test data-structures-basics-linked-list-size-1 "LinkedList size" -body {DataStructuresBasicsTests::run_linked_list_cases} -result {}
+
+test data-structures-basics-stack-push-1 "Stack push" -body {DataStructuresBasicsTests::run_stack_cases} -result {}
+test data-structures-basics-stack-pop-1 "Stack pop" -body {DataStructuresBasicsTests::run_stack_cases} -result {}
+test data-structures-basics-stack-peek-1 "Stack peek" -body {DataStructuresBasicsTests::run_stack_cases} -result {}
+test data-structures-basics-stack-is-empty-1 "Stack is_empty" -body {DataStructuresBasicsTests::run_stack_cases} -result {}
+test data-structures-basics-stack-size-1 "Stack size" -body {DataStructuresBasicsTests::run_stack_cases} -result {}
+
+test data-structures-basics-queue-enqueue-1 "Queue enqueue" -body {DataStructuresBasicsTests::run_queue_cases} -result {}
+test data-structures-basics-queue-dequeue-1 "Queue dequeue" -body {DataStructuresBasicsTests::run_queue_cases} -result {}
+test data-structures-basics-queue-peek-1 "Queue peek" -body {DataStructuresBasicsTests::run_queue_cases} -result {}
+test data-structures-basics-queue-is-empty-1 "Queue is_empty" -body {DataStructuresBasicsTests::run_queue_cases} -result {}
+test data-structures-basics-queue-size-1 "Queue size" -body {DataStructuresBasicsTests::run_queue_cases} -result {}
+
+cleanupTests
