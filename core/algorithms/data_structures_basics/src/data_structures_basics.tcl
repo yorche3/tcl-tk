@@ -19,24 +19,38 @@
 # Tcl 9 con «version conflict … have 9.0.4, need 8.6».
 #
 # `init` de la especificación: en TclOO la inicialización es el `constructor`, así
-# que `[Node new $valor]` deja la celda con su valor y sin enlace, y
-# `[LinkedList new]` —igual `Stack` y `Queue`— deja la estructura vacía. Los
-# constructores quedan implementados: son el estado inicial del contrato. El
-# paquete se publica como `1.0`, que es lo que declara `src/pkgIndex.tcl`.
+# que `[::DataStructuresBasics::Node new $valor]` deja la celda con su valor y sin
+# enlace, y `[LinkedList new]` —igual `Stack` y `Queue`— deja la estructura vacía.
+# Los constructores son el estado inicial del contrato. El paquete se publica como
+# `1.0`, que es lo que declara `src/pkgIndex.tcl`.
 #
-# Adecuaciones de salida de centinela (todavía no hay fallos reales):
-#   - **int → -1**: `get_value`, `get_head`, `pop`, `peek`, `dequeue` y `size`
-#     mientras su cuerpo sea un esqueleto.
-#   - **bool → 0**: `is_empty` y `delete`, que devuelven 0/1 por el `expr` de Tcl.
+# Indicadores de fallo (valores representables, sin excepciones):
+#   - **int → -1**: `get_head`, `peek`, `pop` y `dequeue` cuando la estructura está
+#     vacía. `get_value` y `size` devuelven su valor real.
+#   - **bool → 0/1**: `is_empty` y `delete`; `is_empty` sale del puntero de entrada
+#     y `delete` devuelve 1 cuando borró y 0 cuando el valor no estaba.
 #   - **Solo las clases y los enlaces usan la ausencia nativa `{}`**: `get_next` y
 #     `set_next` devuelven un enlace, y `{}` es la ausencia de nodo. Tcl no tiene
-#     `null`/`nil`: `{}` es la representación nativa, no un centinela nuevo, y es
-#     también el retorno neutro de las operaciones sin resultado de fallo
-#     (`insert_head`, `insert_tail`, `push`, `enqueue`).
-#   - Ningún cuerpo lanza excepciones ni llama a `error`.
+#     `null`/`nil`: `{}` es la representación nativa, no un centinela nuevo. Las
+#     operaciones sin resultado de fallo (`insert_head`, `insert_tail`, `push`,
+#     `enqueue`) devuelven también `{}` porque no tienen nada que informar.
+#   - Ningún cuerpo lanza excepciones ni llama a `error`: el fallo viaja en el
+#     valor devuelto.
 #
-# Implementación pendiente: la escribe el autor. Esta delegación solo genera el
-# contrato (firmas y esqueletos) con las adecuaciones de salida.
+# Mutabilidad: las tres estructuras mutan en sitio, así que cada escenario trabaja
+# con una instancia (`[LinkedList new]` y luego las operaciones). `Node` es la
+# celda compartida: el valor se fija al construir y el enlace se reengancha con
+# `set_next`.
+#
+# Namespaces: los métodos de TclOO no ven los nombres sin cualificar —el namespace
+# actual de un objeto es `::oo::ObjNN`, con el `namespace path` en `::oo::Helpers`,
+# no el namespace donde se definió la clase—, así que las tres estructuras crean la
+# celda con el nombre cualificado `::DataStructuresBasics::Node`.
+#
+# Complejidad: O(1) en `get_head`, `insert_head`, `insert_tail`, `push`, `pop`,
+# `peek`, `enqueue`, `dequeue`, `is_empty` y `size` —las estructuras guardan sus
+# punteros (cabeza/cola, cima, frente/final) y su contador— y O(n) en `delete`,
+# como pide la especificación.
 
 package require Tcl 8.6-
 package require TclOO
@@ -59,19 +73,20 @@ namespace eval DataStructuresBasics {
             set next {}
         }
 
-        # Esqueleto: valor de la celda.
+        # Valor de la celda.
         method get_value {} {
-            return -1
+            return $value
         }
 
-        # Esqueleto: enlace a la celda siguiente, o {} cuando no hay ninguna.
+        # Enlace a la celda siguiente, o {} cuando no hay ninguna.
         method get_next {} {
-            return {}
+            return $next
         }
 
-        # Esqueleto: asigna el enlace y devuelve el enlace nuevo.
+        # Reengancha el enlace y devuelve el enlace nuevo: la celda es mutable.
         method set_next {n} {
-            return {}
+            set next $n
+            return $next
         }
     }
 
@@ -92,34 +107,73 @@ namespace eval DataStructuresBasics {
             set count 0
         }
 
-        # Esqueleto: valor de la cabeza, o -1 cuando la lista está vacía.
+        # Valor de la cabeza, o -1 cuando la lista está vacía. No muta.
         method get_head {} {
-            return -1
+            if {$head eq {}} {
+                return -1
+            }
+            return [$head get_value]
         }
 
-        # Esqueleto: inserta al principio. Sin resultado de fallo.
+        # Inserta al principio: O(1) y sin resultado de fallo.
         method insert_head {v} {
+            set node [::DataStructuresBasics::Node new $v]
+            $node set_next $head
+            set head $node
+            if {$tail eq {}} {
+                set tail $node
+            }
+            incr count
             return {}
         }
 
-        # Esqueleto: inserta al final. Sin resultado de fallo.
+        # Inserta al final: O(1) y sin resultado de fallo. El final guardado es lo
+        # que evita recorrer la lista.
         method insert_tail {v} {
+            set node [::DataStructuresBasics::Node new $v]
+            if {$tail eq {}} {
+                set head $node
+            } else {
+                $tail set_next $node
+            }
+            set tail $node
+            incr count
             return {}
         }
 
-        # Esqueleto: borra la primera aparición; 0 cuando el valor no estaba.
+        # Borra la primera aparición: 1 si borró y 0 si el valor no estaba. O(n).
         method delete {v} {
-            return 0
+            set prev {}
+            set current $head
+            set found 0
+            while {$current ne {}} {
+                if {[$current get_value] == $v} {
+                    set found 1
+                    if {$prev eq {}} {
+                        set head [$current get_next]
+                    } else {
+                        $prev set_next [$current get_next]
+                    }
+                    if {$current eq $tail} {
+                        set tail $prev
+                    }
+                    incr count -1
+                    break
+                }
+                set prev $current
+                set current [$current get_next]
+            }
+            return $found
         }
 
-        # Esqueleto: 1 solo si no hay nodos.
+        # 1 solo si no hay nodos.
         method is_empty {} {
-            return 0
+            return [expr {$head eq {}}]
         }
 
-        # Esqueleto: número de nodos (el centinela es -1 mientras sea esqueleto).
+        # Número de nodos. O(1) sobre el contador.
         method size {} {
-            return -1
+            return $count
         }
     }
 
@@ -138,29 +192,42 @@ namespace eval DataStructuresBasics {
             set count 0
         }
 
-        # Esqueleto: apila sobre la cima. Sin resultado de fallo.
+        # Apila sobre la cima: O(1) y sin resultado de fallo.
         method push {v} {
+            set node [::DataStructuresBasics::Node new $v]
+            $node set_next $top
+            set top $node
+            incr count
             return {}
         }
 
-        # Esqueleto: desapila el valor de la cima, o -1 cuando está vacía.
+        # Desapila: devuelve el valor de la cima, o -1 cuando está vacía. O(1).
         method pop {} {
-            return -1
+            if {$top eq {}} {
+                return -1
+            }
+            set node $top
+            set top [$node get_next]
+            incr count -1
+            return [$node get_value]
         }
 
-        # Esqueleto: valor de la cima, o -1 cuando está vacía. No muta.
+        # Valor de la cima, o -1 cuando está vacía. No muta.
         method peek {} {
-            return -1
+            if {$top eq {}} {
+                return -1
+            }
+            return [$top get_value]
         }
 
-        # Esqueleto: 1 solo si no hay nodos.
+        # 1 solo si no hay nodos.
         method is_empty {} {
-            return 0
+            return [expr {$top eq {}}]
         }
 
-        # Esqueleto: número de nodos (el centinela es -1 mientras sea esqueleto).
+        # Número de nodos. O(1) sobre el contador.
         method size {} {
-            return -1
+            return $count
         }
     }
 
@@ -181,29 +248,51 @@ namespace eval DataStructuresBasics {
             set count 0
         }
 
-        # Esqueleto: encola por el final. Sin resultado de fallo.
+        # Encola por el final: O(1) y sin resultado de fallo. El final guardado es
+        # lo que evita recorrer la cola.
         method enqueue {v} {
+            set node [::DataStructuresBasics::Node new $v]
+            if {$rear eq {}} {
+                set front $node
+                set rear $node
+            } else {
+                $rear set_next $node
+                set rear $node
+            }
+            incr count
             return {}
         }
 
-        # Esqueleto: desencola el valor del frente, o -1 cuando está vacía.
+        # Desencola: devuelve el valor del frente, o -1 cuando está vacía. O(1).
         method dequeue {} {
-            return -1
+            if {$front eq {}} {
+                return -1
+            }
+            set node $front
+            set front [$node get_next]
+            if {$front eq {}} {
+                set rear {}
+            }
+            incr count -1
+            return [$node get_value]
         }
 
-        # Esqueleto: valor del frente, o -1 cuando está vacía. No muta.
+        # Valor del frente, o -1 cuando está vacía. No muta.
         method peek {} {
-            return -1
+            if {$front eq {}} {
+                return -1
+            }
+            return [$front get_value]
         }
 
-        # Esqueleto: 1 solo si no hay nodos.
+        # 1 solo si no hay nodos.
         method is_empty {} {
-            return 0
+            return [expr {$front eq {}}]
         }
 
-        # Esqueleto: número de nodos (el centinela es -1 mientras sea esqueleto).
+        # Número de nodos. O(1) sobre el contador.
         method size {} {
-            return -1
+            return $count
         }
     }
 }
