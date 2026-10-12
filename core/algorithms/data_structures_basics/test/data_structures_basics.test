@@ -1,0 +1,9 @@
+# Test runner scaffold for data_structures_basics.
+# Test cases are added in the suite step (4c).
+
+package require tcltest
+package require data_structures_basics 1.0
+
+namespace import ::tcltest::*
+
+cleanupTests
