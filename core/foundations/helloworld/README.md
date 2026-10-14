@@ -60,7 +60,7 @@ puts "Hello, World! from Tcl/Tk!"
 
 ---
 
-## 🚀 Ejecución / Run
+## 🚀 Compilación y ejecución / Build & Run
 
 ### Requisitos / Requirements
 
@@ -99,7 +99,7 @@ tclsh hello_world.tcl
 ### Salida esperada / Expected output
 
 ```text
-Hello, World! from TCL/TK
+Hello, World! from Tcl/Tk!
 ```
 
 La salida fue verificada con Tcl 9.0.4 en WSL2.
