@@ -10,7 +10,7 @@ Este ejercicio utiliza Tcl para imprimir un saludo en la salida estándar. Tk no
 
 | Archivo | Propósito |
 |---------|-----------|
-| [`hello_world.tcl`](hello_world.tcl) | Código fuente: imprime `"Hello, World! from TCL/TK"`. |
+| [`hello_world.tcl`](hello_world.tcl) | Código fuente: imprime `"Hello, World! from Tcl/Tk!"`. |
 
 **Estructura de directorios esperada:**
 
@@ -47,13 +47,13 @@ helloworld/
 No se requieren archivos de configuración para este ejercicio. El script usa únicamente el comando estándar `puts` de Tcl.
 
 ```tcl
-puts "Hello, World! from TCL/TK"
+puts "Hello, World! from Tcl/Tk!"
 ```
 
 | Elemento | Propósito |
 |----------|-----------|
 | `puts` | Escribe texto en la salida estándar y añade un salto de línea. |
-| `"Hello, World! from TCL/TK"` | Cadena que se muestra al usuario. |
+| `"Hello, World! from Tcl/Tk!"` | Cadena que se muestra al usuario. |
 
 > **ES:** El programa no utiliza Tk porque no necesita ventanas ni widgets; `tclsh` es suficiente para ejecutar este script Tcl.
 > **EN:** The program does not use Tk because it needs no windows or widgets; `tclsh` is sufficient to run this Tcl script.
