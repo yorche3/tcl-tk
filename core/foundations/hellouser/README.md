@@ -63,7 +63,7 @@ The program flow is:
 No se requieren archivos de configuración para este ejercicio. El script utiliza únicamente comandos estándar de Tcl.
 
 ```tcl
-puts -nonewline "Please enter your name: "
+puts -nonewline "Enter your name: "
 flush stdout
 set name [gets stdin]
 puts "Hello, $name!"
@@ -125,7 +125,7 @@ printf 'Ada\n' | tclsh9.0 hello_user.tcl
 Con la entrada `Ada`, la salida verificada es:
 
 ```text
-Please enter your name: Hello, Ada!
+Enter your name: Hello, Ada!
 ```
 
 El prompt y la entrada aparecen en la misma línea porque `puts -nonewline` no añade un salto de línea. El saludo aparece en la misma línea en una ejecución con entrada redirigida, y `puts` añade el salto de línea final.
