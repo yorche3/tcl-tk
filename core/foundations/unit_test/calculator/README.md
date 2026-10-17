@@ -69,7 +69,7 @@ La suite usa `package require tcltest`, registra un test por operación y agrupa
 
 ---
 
-## 🚀 Ejecución / Run
+## 🚀 Compilación y ejecución / Build & Run
 
 ### Requisitos / Requirements
 
