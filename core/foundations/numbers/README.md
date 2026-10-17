@@ -77,7 +77,7 @@ Each suite groups cases by algorithm: 5 tests per suite contain 11 assertions/ca
 
 ---
 
-## 🚀 Ejecución / Run
+## 🚀 Compilación y ejecución / Build & Run
 
 ### Requisitos / Requirements
 
